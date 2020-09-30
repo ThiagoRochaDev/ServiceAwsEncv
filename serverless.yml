@@ -1,11 +1,10 @@
-service: client-process-image-recognition
-
+service: RecognitionImages-CreateBuckets
 custom:
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy: []
-  OPENCV_PROCESS_BUCKET: client-image-upload
-  OPENCV_OUTPUT_BUCKET: client-image-processing
+  OPENCV_PROCESS_BUCKET: image-bucket-upload
+  OPENCV_OUTPUT_BUCKET: image-bucket-recognized
 
 provider:
   name: aws
@@ -13,17 +12,24 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - s3:GetObject
+        - 's3:GetObject'
+        - 's3:ListBucket'
+        - 's3:PutObject'
+        - 's3:PutObjectTagging'
       Resource:
         - arn:aws:s3:::${self:custom.OPENCV_PROCESS_BUCKET}/*
     - Effect: Allow
       Action:
-        - s3:PutObject
+        - 's3:PutObject'
+        - 's3:ListBucket'
+        - 's3:GetObject'
+        - 's3:PutObjectTagging'
       Resource:
         - arn:aws:s3:::${self:custom.OPENCV_OUTPUT_BUCKET}/*
   environment:
     OPENCV_OUTPUT_BUCKET: ${self:custom.OPENCV_OUTPUT_BUCKET}
 
+# vincula a func opencv ao bucket de saída
 functions:
   opencv:
     handler: handler.opencv
@@ -31,14 +37,31 @@ functions:
       - s3:
           bucket: ${self:custom.OPENCV_PROCESS_BUCKET}
           event: s3:ObjectCreated:*
+          
+
 
 resources:
   Resources:
-
     S3Bucket:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.OPENCV_OUTPUT_BUCKET}
+        AccessControl: PublicRead
+   
+
+AttachmentsBucketAllowPublicReadPolicy:
+  Type: AWS::S3::BucketPolicy
+  Properties:
+    Bucket: !Ref S3Bucket
+    PolicyDocument:
+      Version: "2012-10-17"
+      Statement: 
+        - Effect: Allow
+          Action: 
+            - "s3:GetObject"
+          Resource: 
+            - !Join ['/', [!Ref S3Bucket, 'public']]
+          Principal: "*"
 
 plugins:
   - serverless-python-requirements
