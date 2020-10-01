@@ -18,6 +18,8 @@ provider:
         - 's3:PutObjectTagging'
       Resource:
         - arn:aws:s3:::${self:custom.OPENCV_PROCESS_BUCKET}/*
+        - arn:aws:s3:::*
+        - arn:aws:s3:::*/*
     - Effect: Allow
       Action:
         - 's3:PutObject'
@@ -26,6 +28,8 @@ provider:
         - 's3:PutObjectTagging'
       Resource:
         - arn:aws:s3:::${self:custom.OPENCV_OUTPUT_BUCKET}/*
+        - arn:aws:s3:::*
+        - arn:aws:s3:::*/*
   environment:
     OPENCV_OUTPUT_BUCKET: ${self:custom.OPENCV_OUTPUT_BUCKET}
 
@@ -46,7 +50,7 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.OPENCV_OUTPUT_BUCKET}
-        AccessControl: PublicRead
+        #AccessControl: PublicRead
    
 
 AttachmentsBucketAllowPublicReadPolicy:
