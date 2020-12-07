@@ -13,9 +13,13 @@ def opencv(event, context):
 
     bucketName = event['Records'][0]['s3']['bucket']['name']
     bucketKey = event['Records'][0]['s3']['object']['key']
-
-    download_path = '/tmp/{}{}'.format(uuid.uuid4(), bucketKey)
-    output_path = '/tmp/{}'.format(bucketKey)
+    print(event)
+    arr = event['Records'][0]['s3']['object']['key']
+    folder = arr.split("/")
+    download_path = '/tmp/{}'.format( folder[1])
+    output_path = '/tmp/{}'.format(folder[1])
+    print(folder)
+    print(folder[0], folder[1])
 
     s3Client.download_file(bucketName, bucketKey, download_path)
 
