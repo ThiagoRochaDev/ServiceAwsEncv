@@ -9,18 +9,14 @@ s3Client = boto3.client('s3')
 
 
 def opencv(event, context):
-    
+
 
     bucketName = event['Records'][0]['s3']['bucket']['name']
     bucketKey = event['Records'][0]['s3']['object']['key']
-    print(event)
-    arr = event['Records'][0]['s3']['object']['key']
-    folder = arr.split("/")
-    download_path = '/tmp/{}'.format( folder[1])
-    output_path = '/tmp/{}'.format(folder[1])
-    print(folder)
-    print(folder[0], folder[1])
 
+    download_path = '/tmp/{}{}'.format(uuid.uuid4(), bucketKey)
+    output_path = '/tmp/{}'.format(bucketKey)
+    print(event)
     s3Client.download_file(bucketName, bucketKey, download_path)
 
     try:
@@ -53,16 +49,16 @@ def opencv(event, context):
                         for(x, y, l, a) in faces:
                             imagem = cv2.rectangle(img, (x, y), (x + l, y + a), (255, 0, 255), 2)
                             localOlho = imagem[y:y + a, x:x + l]
-                            
+
                             localOlhoCinza = cv2.cvtColor(localOlho, cv2.COLOR_BGR2GRAY)   
                             detectado = carregaOlho.detectMultiScale(localOlhoCinza)
 
                             for(ox, oy, ol, oa) in detectado:
                                 cv2.rectangle(localOlho, (ox, oy), (ox + ol, oy + oa), (0, 255, 0), 2)
-                                
+
                         cv2.imwrite(output_path, cv2.drawContours(img, [hull], 0, (0,255,0),3))
 
-              
+
     except Exception as e:
         print(e)
         print('Error processing file with OpenCV')
@@ -74,8 +70,4 @@ def opencv(event, context):
         print('Error uploading file to output bucket')
         raise e
     return bucketKey
-
-
-
-    
 

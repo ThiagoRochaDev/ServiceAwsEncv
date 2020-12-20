@@ -1,9 +1,9 @@
-service: RecognitionImages-CreateBuckets
+service: RecognitionImages-CreateBucket
 custom:
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy: []
-  OPENCV_PROCESS_BUCKET: image-bucket-upload
+  OPENCV_PROCESS_BUCKET: image-bucket-uploads
   OPENCV_OUTPUT_BUCKET: image-bucket-recognized
 
 provider:
