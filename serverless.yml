@@ -1,4 +1,4 @@
-service: RecognitionImages-CreateBucket
+service: Recognition-Images-CreateBucket
 custom:
   pythonRequirements:
     dockerizePip: non-linux
@@ -32,6 +32,7 @@ provider:
         - arn:aws:s3:::*/*
   environment:
     OPENCV_OUTPUT_BUCKET: ${self:custom.OPENCV_OUTPUT_BUCKET}
+    OPENCV_PROCESS_BUCKET: ${self:custom.OPENCV_PROCESS_BUCKET}
 
 # vincula a func opencv ao bucket de saída
 functions:
@@ -45,27 +46,9 @@ functions:
 
 
 resources:
-  Resources:
-    S3Bucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:custom.OPENCV_OUTPUT_BUCKET}
-        #AccessControl: PublicRead
+  - ${file(bucket_recognized.yml)}
+  #- ${file(bucket_upload.yml)}  
    
-
-AttachmentsBucketAllowPublicReadPolicy:
-  Type: AWS::S3::BucketPolicy
-  Properties:
-    Bucket: !Ref S3Bucket
-    PolicyDocument:
-      Version: "2012-10-17"
-      Statement: 
-        - Effect: Allow
-          Action: 
-            - "s3:GetObject"
-          Resource: 
-            - !Join ['/', [!Ref S3Bucket, 'public']]
-          Principal: "*"
 
 plugins:
   - serverless-python-requirements
