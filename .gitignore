@@ -21,3 +21,5 @@ var/
 
 # Misc
 node_modules/
+venv/
+.idea/

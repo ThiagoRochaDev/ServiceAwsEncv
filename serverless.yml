@@ -47,6 +47,7 @@ functions:
 
 resources:
   - ${file(bucket_recognized.yml)}
+  - ${file(autoscaling_groups.yml)}
   #- ${file(bucket_upload.yml)}  
    
 
